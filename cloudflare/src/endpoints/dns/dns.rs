@@ -141,6 +141,26 @@ pub struct UpdateDnsRecordParams<'a> {
     pub tags: Option<&'a [String]>,
 }
 
+/// Export DNS Records as a BIND zone file. The response is plain text.
+/// <https://developers.cloudflare.com/api/resources/dns/subresources/records/methods/export/>
+#[derive(Debug)]
+pub struct ExportDnsRecords<'a> {
+    pub zone_identifier: &'a str,
+}
+
+impl EndpointSpec for ExportDnsRecords<'_> {
+    const IS_RAW_BODY: bool = true;
+    type JsonResponse = ();
+    type ResponseType = Vec<u8>;
+
+    fn method(&self) -> Method {
+        Method::GET
+    }
+    fn path(&self) -> String {
+        format!("zones/{}/dns_records/export", self.zone_identifier)
+    }
+}
+
 /// Patch DNS Record: change only the fields that are set.
 /// <https://developers.cloudflare.com/api/resources/dns/subresources/records/methods/edit/>
 #[derive(Debug)]
@@ -261,15 +281,34 @@ pub struct Meta {}
 #[serde(tag = "type")]
 #[allow(clippy::upper_case_acronyms)]
 pub enum DnsContent {
-    A { content: Ipv4Addr },
-    AAAA { content: Ipv6Addr },
-    CAA { content: String },
-    CNAME { content: String },
-    NS { content: String },
-    MX { content: String, priority: u16 },
-    PTR { content: String },
-    TXT { content: String },
-    SRV { content: String },
+    A {
+        content: Ipv4Addr,
+    },
+    AAAA {
+        content: Ipv6Addr,
+    },
+    CAA {
+        content: String,
+    },
+    CNAME {
+        content: String,
+    },
+    NS {
+        content: String,
+    },
+    MX {
+        content: String,
+        priority: u16,
+    },
+    PTR {
+        content: String,
+    },
+    TXT {
+        content: String,
+    },
+    SRV {
+        content: String,
+    },
     /// Any other record type, with the type name as the API reports it.
     #[serde(untagged)]
     Other {
