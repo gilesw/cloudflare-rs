@@ -49,7 +49,10 @@ impl fmt::Display for ApiFailure {
             ApiFailure::Error(status, api_errors) => {
                 let mut output = format!("HTTP {status}");
                 for err in &api_errors.errors {
-                    let _ = write!(output, "\n{}: {} ({:?})", err.code, err.message, err.other);
+                    let _ = write!(output, "\n{}: {}", err.code, err.message);
+                    if !err.other.is_empty() {
+                        let _ = write!(output, " ({:?})", err.other);
+                    }
                 }
                 for (k, v) in &api_errors.other {
                     let _ = write!(output, "\n{k}: {v}");
