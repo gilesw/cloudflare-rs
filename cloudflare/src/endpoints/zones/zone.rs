@@ -86,6 +86,9 @@ pub struct CreateZoneParams<'a> {
 #[derive(Serialize, Clone, Debug, Default)]
 pub struct ListZonesParams {
     pub name: Option<String>,
+    /// Only zones belonging to this account
+    #[serde(rename = "account.id")]
+    pub account_id: Option<String>,
     pub status: Option<Status>,
     pub page: Option<u32>,
     pub per_page: Option<u32>,
@@ -256,5 +259,18 @@ mod tests {
         assert!(matches!(zone.zone_type, Type::Secondary));
         assert!(matches!(zone.owner, Owner::Other));
         assert!(zone.permissions.is_empty());
+    }
+
+    #[test]
+    fn list_filters_by_account() {
+        let params = ListZonesParams {
+            name: Some("example.com".into()),
+            account_id: Some("acc".into()),
+            ..Default::default()
+        };
+        assert_eq!(
+            serialize_query(&params).unwrap(),
+            "name=example.com&account.id=acc"
+        );
     }
 }

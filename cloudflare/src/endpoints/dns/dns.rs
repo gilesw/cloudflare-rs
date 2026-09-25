@@ -141,6 +141,29 @@ pub struct UpdateDnsRecordParams<'a> {
     pub tags: Option<&'a [String]>,
 }
 
+/// DNS Record Details
+/// <https://developers.cloudflare.com/api/resources/dns/subresources/records/methods/get/>
+#[derive(Debug)]
+pub struct DnsRecordDetails<'a> {
+    pub zone_identifier: &'a str,
+    pub identifier: &'a str,
+}
+
+impl EndpointSpec for DnsRecordDetails<'_> {
+    type JsonResponse = DnsRecord;
+    type ResponseType = ApiSuccess<Self::JsonResponse>;
+
+    fn method(&self) -> Method {
+        Method::GET
+    }
+    fn path(&self) -> String {
+        format!(
+            "zones/{}/dns_records/{}",
+            self.zone_identifier, self.identifier
+        )
+    }
+}
+
 /// Export DNS Records as a BIND zone file. The response is plain text.
 /// <https://developers.cloudflare.com/api/resources/dns/subresources/records/methods/export/>
 #[derive(Debug)]
